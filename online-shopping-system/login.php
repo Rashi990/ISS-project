@@ -11,7 +11,15 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 	$email = mysqli_real_escape_string($con,$_POST["email"]);
 	$password = $_POST["password"];
 	$sql = "SELECT * FROM user_info WHERE email = '$email' AND password = '$password'";
-	$run_query = mysqli_query($con,$sql);
+		
+		//Vulnerability 1
+		//Fixing sql injection- by creating prepared statements and bind the parameters
+	$sth = $dbh->prepare($sql);
+	$sth->bindParam(':emaill', $email, ':password',$password);
+	$sth->execute();
+	$run_query = $sth->mysqli_query($con,$sql);
+
+	//$run_query = mysqli_query($con,$sql);
 	$count = mysqli_num_rows($run_query);
     $row = mysqli_fetch_array($run_query);
 		$_SESSION["uid"] = $row["user_id"];
