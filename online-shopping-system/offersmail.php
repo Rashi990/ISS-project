@@ -23,8 +23,15 @@ if (isset($_POST["email"])) {
 		exit();
 	}
         $sql = "SELECT email_id FROM email_info WHERE email = '$email' LIMIT 1" ;
-        $check_query = mysqli_query($con,$sql);
-        $count_email = mysqli_num_rows($check_query);
+
+            /*Vulnerability-SQL injection  
+    	    Fixing - Using a prepared statement with parameter binding */
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $check_query = mysqli_stmt_get_result($stmt);
+            $count_email = mysqli_num_rows($check_query);
+
         if($count_email > 0){
             echo "
                 <div class='alert alert-danger'>
@@ -35,10 +42,13 @@ if (isset($_POST["email"])) {
             exit();
         }else{
             
-            $sql = "INSERT INTO `email_info` 
-            (`email_id`, `email`)
-            VALUES (NULL, '$email')";
-            $run_query = mysqli_query($con,$sql);
+            /*Vulnerability-SQL injection  
+    	    Fixing - Using a prepared statement with parameter binding */
+            $sql = "INSERT INTO `email_info` (`email_id`, `email`) VALUES (NULL, ?)";
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            $run_query = mysqli_stmt_execute($stmt);
+
                 echo "<div class='alert alert-success'>
                     <a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>
                     <b>Thanks for subscribing</b>
