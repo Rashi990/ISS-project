@@ -98,8 +98,15 @@ if(empty($f_name) || empty($l_name) || empty($email) || empty($password) || empt
 	}
 	//existing email address in our database
 	$sql = "SELECT user_id FROM user_info WHERE email = '$email' LIMIT 1" ;
-	$check_query = mysqli_query($con,$sql);
-	$count_email = mysqli_num_rows($check_query);
+
+		/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+		$stmt = mysqli_prepare($con, $sql);
+		mysqli_stmt_bind_param($stmt, "s", $email);
+		mysqli_stmt_execute($stmt);
+		$result = mysqli_stmt_get_result($stmt);
+		$count_email = mysqli_num_rows($result);
+
 	if($count_email > 0){
 		echo "
 			<div class='alert alert-danger'>
@@ -111,21 +118,25 @@ if(empty($f_name) || empty($l_name) || empty($email) || empty($password) || empt
 	} else {
 		
 		$sql = "INSERT INTO `user_info` 
-		(`user_id`, `first_name`, `last_name`, `email`, 
-		`password`, `mobile`, `address1`, `address2`) 
-		VALUES (NULL, '$f_name', '$l_name', '$email', 
-		'$password', '$mobile', '$address1', '$address2')";
-		$run_query = mysqli_query($con,$sql);
-		$_SESSION["uid"] = mysqli_insert_id($con);
-		$_SESSION["name"] = $f_name;
-		$ip_add = getenv("REMOTE_ADDR");
-		$sql = "UPDATE cart SET user_id = '$_SESSION[uid]' WHERE ip_add='$ip_add' AND user_id = -1";
-		if(mysqli_query($con,$sql)){
-			echo "register_success";
-			echo "<script> location.href='store.php'; </script>";
-            exit;
+  (`user_id`, `first_name`, `last_name`, `email`, 
+  `password`, `mobile`, `address1`, `address2`) 
+  VALUES (NULL, ?, ?, ?, 
+  ?, ?, ?, ?)";
+  $stmt = mysqli_prepare($con, $sql);
+  mysqli_stmt_bind_param($stmt, "ssssiss", $f_name, $l_name, $email, $password, $mobile, $address1, $address2);
+  mysqli_stmt_execute($stmt);
+  $_SESSION["uid"] = mysqli_insert_id($con);
+  $_SESSION["name"] = $f_name;
+  $ip_add = getenv("REMOTE_ADDR");
+  $sql = "UPDATE cart SET user_id = ? WHERE ip_add=? AND user_id = -1";
+  $stmt = mysqli_prepare($con, $sql);
+  mysqli_stmt_bind_param($stmt, "is", $_SESSION["uid"], $ip_add);
+  mysqli_stmt_execute($stmt);
+
+  echo "register_success";
+  echo "<script> location.href='store.php'; </script>";
+  exit;
 		}
-	}
 	}
 	
 }
