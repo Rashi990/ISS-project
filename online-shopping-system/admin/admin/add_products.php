@@ -26,7 +26,13 @@ if($picture_type=="image/jpeg" || $picture_type=="image/jpg" || $picture_type=="
 		$pic_name=time()."_".$picture_name;
 		move_uploaded_file($picture_tmp_name,"../product_images/".$pic_name);
 		
-mysqli_query($con,"insert into products (product_cat, product_brand,product_title,product_price, product_desc, product_image,product_keywords) values ('$product_type','$brand','$product_name','$price','$details','$pic_name','$tags')") or die ("query incorrect");
+    
+		/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+    $stmt = $con->prepare("INSERT INTO products (product_cat, product_brand, product_title, product_price, product_desc, product_image, product_keywords) VALUES (?,?,?,?,?,?,?)");
+    $stmt->bind_param("issdsss", $product_type, $brand, $product_name, $price, $details, $pic_name, $tags);
+    $stmt->execute();
+    $stmt->close();
 
  header("location: sumit_form.php?success=1");
 }
