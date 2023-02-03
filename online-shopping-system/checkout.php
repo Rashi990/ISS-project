@@ -190,15 +190,15 @@ span.price {
 						$query = mysqli_query($con,$sql);
 						$row=mysqli_fetch_array($query);
 						$product_id=$row["product_id"];
-						echo "	
+						echo htmlspecialchars("	
 						<input type='hidden' name='prod_id_$i' value='$product_id'>
 						<input type='hidden' name='prod_price_$i' value='$amount_'>
 						<input type='hidden' name='prod_qty_$i' value='$quantity_'>
-						";
+						");
 						$i++;
 					}
 					
-				echo'	
+				echo htmlspecialchars('	
 				<input type="hidden" name="total_count" value="'.$total_count.'">
 					<input type="hidden" name="total_price" value="'.$total.'">
 					
@@ -206,7 +206,7 @@ span.price {
 				</form>
 				</div>
 			</div>
-			';
+			');
 		}else{
 			echo"<script>window.location.href = 'cart.php'</script>";
 		}
@@ -218,11 +218,11 @@ span.price {
 				<?php
 				if (isset($_POST["cmd"])) {
 				
-					$user_id = htmlspecialchars($_POST['custom']);
+					$user_id = $_POST['custom'];
 					
 					
 					$i=1;
-					echo
+					echo htmlspecialchars(
 					"
 					<h4>Cart 
 					<span class='price' style='color:black'>
@@ -239,7 +239,7 @@ span.price {
 					<th >	amount</th></tr>
 					</thead>
 					<tbody>
-					";
+					");
 					$total=0;
 					while($i<=$total_count){
 						$item_name_ = $_POST['item_name_'.$i];
@@ -255,20 +255,20 @@ span.price {
 						$row=mysqli_fetch_array($query);
 						$product_id=$row["product_id"];
 					
-						echo "	
+						echo htmlspecialchars("	
 
-						<tr><td><p>$item_number_</p></td><td><p>$item_name_</p></td><td ><p>$quantity_</p></td><td ><p>$amount_</p></td></tr>";
+						<tr><td><p>$item_number_</p></td><td><p>$item_name_</p></td><td ><p>$quantity_</p></td><td ><p>$amount_</p></td></tr>");
 						
 						$i++;
 					}
 
-				echo"
+				echo htmlspecialchars("
 
 				</tbody>
 				</table>
 				<hr>
 				
-				<h3>total<span class='price' style='color:black'><b>$$total</b></span></h3>";
+				<h3>total<span class='price' style='color:black'><b>$$total</b></span></h3>");
 					
 				}
 				?>
