@@ -3,7 +3,7 @@
 session_start();
 include("../../db.php");
 $user_id=$_REQUEST['user_id'];
-
+$user_id = filter_var($user_id, FILTER_VALIDATE_INT);
 
 if(isset($_POST['btn_save'])) 
 {
