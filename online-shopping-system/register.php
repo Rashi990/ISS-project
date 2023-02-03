@@ -3,14 +3,14 @@ session_start();
 include "db.php";
 if (isset($_POST["f_name"])) {
 
-	$f_name = $_POST["f_name"];
-	$l_name = $_POST["l_name"];
-	$email = $_POST['email'];
-	$password = $_POST['password'];
-	$repassword = $_POST['repassword'];
-	$mobile = $_POST['mobile'];
-	$address1 = $_POST['address1'];
-	$address2 = $_POST['address2'];
+        $f_name =htmlspecialchars( $_POST["f_name"], ENT_QUOTES, 'UTF-8');
+	$l_name = htmlspecialchars($_POST["l_name"], ENT_QUOTES, 'UTF-8');
+	$email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+	$password =htmlspecialchars( $_POST['password'], ENT_QUOTES, 'UTF-8');
+	$repassword =htmlspecialchars( $_POST['repassword'], ENT_QUOTES, 'UTF-8');
+	$mobile =htmlspecialchars( $_POST['mobile'], ENT_QUOTES, 'UTF-8');
+	$address1 = htmlspecialchars($_POST['address1'], ENT_QUOTES, 'UTF-8');
+	$address2 = htmlspecialchars($_POST['address2'], ENT_QUOTES, 'UTF-8');
 	$name = "/^[a-zA-Z ]+$/";
 	$emailValidation = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9]+(\.[a-z]{2,4})$/";
 	$number = "/^[0-9]+$/";
