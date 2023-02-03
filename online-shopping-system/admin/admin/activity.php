@@ -18,6 +18,7 @@ $order_id=$_GET['order_id'];
 
 ///pagination
 $page=$_GET['page'];
+$page = filter_var($page, FILTER_VALIDATE_INT);
 
 if($page=="" || $page=="1")
 {
