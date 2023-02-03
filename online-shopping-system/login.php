@@ -51,9 +51,11 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 			}
 			//if user is login from page we will send login_success
 			echo "login_success";
-			$BackToMyPage = $_SERVER['HTTP_REFERER'];
-				if(!isset($BackToMyPage)) {
-					header('Location: '.$BackToMyPage);
+			$backToMyPage = filter_var($backToMyPage, FILTER_VALIDATE_URL);
+                        $trustedURLs = array('https://example.com', 'https://example.org');
+
+                            if ($backToMyPage && in_array($backToMyPage, $trustedURLs)) {
+                            header('Location: '.$backToMyPage);
 					echo"<script type='text/javascript'>
 					
 					</script>";
