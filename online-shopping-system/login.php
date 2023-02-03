@@ -56,19 +56,20 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 				
 			}
 			//if user is login from page we will send login_success
-			echo "login_success";
-			$BackToMyPage = $_SERVER['HTTP_REFERER'];
-				if(!isset($BackToMyPage)) {
-					header('Location: '.$BackToMyPage);
-					echo"<script type='text/javascript'>
-					
-					</script>";
-				} else {
-					echo "<script> location.href='index.php'; </script>" ;// default page
-				} 
-				
-			
-            exit;
+		echo "login_success";
+
+$BackToMyPage = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL);
+$trusted_urls = array('https://example.com', 'https://example.org');
+
+if(in_array($BackToMyPage, $trusted_urls)) {
+  header('Location: '.$BackToMyPage);
+  echo"<script type='text/javascript'>
+  </script>";
+} else {
+  echo "<script> location.href='index.php'; </script>" ;// default page
+} 
+
+exit;
 
 		}else{
                 $email = mysqli_real_escape_string($con,$_POST["email"]);
