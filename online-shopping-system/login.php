@@ -9,19 +9,17 @@ session_start();
 
 if(isset($_POST["email"]) && isset($_POST["password"])){
 	$email = mysqli_real_escape_string($con,$_POST["email"]);
-	$password = $_POST["password"];
-	$sql = "SELECT * FROM user_info WHERE email = '$email' AND password = '$password'";
-		
-		//Vulnerability 1
-		//Fixing sql injection- by creating prepared statements and bind the parameters
-	$sth = $dbh->prepare($sql);
-	$sth->bindParam(':emaill', $email, ':password',$password);
-	$sth->execute();
-	$run_query = $sth->mysqli_query($con,$sql);
+	$password = mysqli_real_escape_string($con,$_POST["password"]);
+	$sql = "SELECT * FROM user_info WHERE email = ? AND password = ?";
 
-	//$run_query = mysqli_query($con,$sql);
-	$count = mysqli_num_rows($run_query);
-    $row = mysqli_fetch_array($run_query);
+		/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+	$stmt = mysqli_prepare($con, $sql);
+	mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+	mysqli_stmt_execute($stmt);
+	$result = mysqli_stmt_get_result($stmt);
+	$count = mysqli_num_rows($result);
+    $row = mysqli_fetch_array($result);
 		$_SESSION["uid"] = $row["user_id"];
 		$_SESSION["name"] = $row["first_name"];
 		$ip_add = getenv("REMOTE_ADDR");

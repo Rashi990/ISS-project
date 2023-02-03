@@ -8,8 +8,12 @@ if(isset($_GET['action']) && $_GET['action']!="" && $_GET['action']=='delete')
 {
 $order_id=$_GET['order_id'];
 
-/*this is delet query*/
-mysqli_query($con,"delete from orders where order_id='$order_id'")or die("delete query is incorrect...");
+   /*Vulnerability-SQL injection  
+    Fixing - Using a prepared statement with parameter binding */
+ $stmt = mysqli_prepare($con, "DELETE FROM orders WHERE order_id = ?");
+ mysqli_stmt_bind_param($stmt, "s", $order_id);
+ mysqli_stmt_execute($stmt);
+ mysqli_stmt_close($stmt);
 } 
 
 ///pagination
