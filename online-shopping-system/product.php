@@ -59,15 +59,22 @@ include "header.php";
 								include 'db.php';
 								$product_id = $_GET['p'];
 								
-								$sql = " SELECT * FROM products ";
-								$sql = " SELECT * FROM products WHERE product_id = $product_id";
-								if (!$con) {
-									die("Connection failed: " . mysqli_connect_error());
-								}
-								$result = mysqli_query($con, $sql);
-								if (mysqli_num_rows($result) > 0) 
-								{
-									while($row = mysqli_fetch_assoc($result)) 
+							/*Vulnerability-SQL injection  
+    						Fixing - Using a prepared statement with parameter binding */	
+								 // Sanitize the input to prevent SQL injection
+								 $product_id = mysqli_real_escape_string($con, $product_id);
+								 // Prepare the query
+								 $sql = "SELECT * FROM products WHERE product_id = ?";
+								 // Prepare the statement
+								 $stmt = mysqli_prepare($con, $sql);
+								 // Bind the parameters
+								 mysqli_stmt_bind_param($stmt, "i", $product_id);
+								 // Execute the statement
+								 mysqli_stmt_execute($stmt);
+								 // Get the result
+								 $result = mysqli_stmt_get_result($stmt);
+								 if (mysqli_num_rows($result) > 0) {
+								   while($row = mysqli_fetch_assoc($result)) 
 									{
 									echo '
 									
