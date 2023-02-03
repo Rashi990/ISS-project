@@ -5,13 +5,13 @@ session_start();
 unset($_SESSION["uid"]);
 unset($_SESSION["name"]);
 
-$backToMyPage = $_SERVER['HTTP_REFERER'];
+$backToMyPage = filter_var($backToMyPage, FILTER_VALIDATE_URL);
 $trustedURLs = array('https://example.com', 'https://example.org');
 
-if (isset($backToMyPage) && in_array($backToMyPage, $trustedURLs)) {
+if ($backToMyPage && in_array($backToMyPage, $trustedURLs)) {
     header('Location: '.$backToMyPage);
 } else {
-    header('Location: index.php'); // default page
+    header('Location: https://example.com');
 }
 
 exit;
