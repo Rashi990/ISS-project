@@ -109,8 +109,14 @@ span.price {
 		<?php
 		if(isset($_SESSION["uid"])){
 			$sql = "SELECT * FROM user_info WHERE user_id='$_SESSION[uid]'";
-			$query = mysqli_query($con,$sql);
-			$row=mysqli_fetch_array($query);
+
+			/*Vulnerability-SQL injection  
+    		Fixing - Using a prepared statement with parameter binding */
+			$stmt = mysqli_prepare($con, $sql);
+			mysqli_stmt_bind_param($stmt, "s", $_SESSION["uid"]);
+			mysqli_stmt_execute($stmt);
+			$result = mysqli_stmt_get_result($stmt);
+			$row=mysqli_fetch_array($result);
 		
 		echo'
 			<div class="col-75">
