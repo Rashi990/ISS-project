@@ -4,11 +4,13 @@ $ip_add = getenv("REMOTE_ADDR");
 include "db.php";
 if(isset($_POST["category"])){
 	$category_query = "SELECT * FROM categories";
-    
-	$run_query = mysqli_query($con,$category_query) or die(mysqli_error($con));
+    	/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+	$stmt = mysqli_prepare($con, $category_query);
+	mysqli_stmt_execute($stmt);
+	$result = mysqli_stmt_get_result($stmt);
+	
 	echo "
-		
-            
             <div class='aside'>
 							<h3 class='aside-title'>Categories</h3>
 							<div class='btn-group-vertical'>
@@ -20,10 +22,17 @@ if(isset($_POST["category"])){
 			$cid = $row["cat_id"];
 			$cat_name = $row["cat_title"];
             $sql = "SELECT COUNT(*) AS count_items FROM products WHERE product_cat=$i";
-            $query = mysqli_query($con,$sql);
-            $row = mysqli_fetch_array($query);
-            $count=$row["count_items"];
-            $i++;
+
+			/*Vulnerability-SQL injection  
+    		Fixing - Using a prepared statement with parameter binding */
+            $stmt = mysqli_prepare($con, $sql);
+      		mysqli_stmt_bind_param($stmt, "i", $i);
+      		mysqli_stmt_execute($stmt);
+      		$query_result = mysqli_stmt_get_result($stmt);
+      		$count_row = mysqli_fetch_array($query_result);
+      		$count = $count_row["count_items"];
+      		$i++;
+
             
             
 			echo "
@@ -47,7 +56,13 @@ if(isset($_POST["category"])){
 }
 if(isset($_POST["brand"])){
 	$brand_query = "SELECT * FROM brands";
-	$run_query = mysqli_query($con,$brand_query);
+
+			/*Vulnerability-SQL injection  
+    		Fixing - Using a prepared statement with parameter binding */
+	$stmt = mysqli_prepare($con, $brand_query);
+  	mysqli_stmt_execute($stmt);
+  	$result = mysqli_stmt_get_result($stmt);
+
 	echo "
 		<div class='aside'>
 							<h3 class='aside-title'>Brand</h3>
@@ -101,8 +116,14 @@ if(isset($_POST["getProduct"])){
 	}else{
 		$start = 0;
 	}
-	$product_query = "SELECT * FROM products,categories WHERE product_cat=cat_id LIMIT $start,$limit";
-	$run_query = mysqli_query($con,$product_query);
+
+		/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+	$stmt = mysqli_prepare($con, "SELECT * FROM products, categories WHERE product_cat=cat_id LIMIT ?,?");
+    mysqli_stmt_bind_param($stmt, "ii", $start, $limit);
+    mysqli_stmt_execute($stmt);
+    $run_query = mysqli_stmt_get_result($stmt);
+
 	if(mysqli_num_rows($run_query) > 0){
 		while($row = mysqli_fetch_array($run_query)){
 			$pro_id    = $row['product_id'];
@@ -155,22 +176,24 @@ if(isset($_POST["getProduct"])){
 
 
 if(isset($_POST["get_seleted_Category"]) || isset($_POST["selectBrand"]) || isset($_POST["search"])){
-	if(isset($_POST["get_seleted_Category"])){
-		$id = $_POST["cat_id"];
-		$sql = "SELECT * FROM products,categories WHERE product_cat = '$id' AND product_cat=cat_id";
-        
-	}else if(isset($_POST["selectBrand"])){
-		$id = $_POST["brand_id"];
-		$sql = "SELECT * FROM products,categories WHERE product_brand = '$id' AND product_cat=cat_id";
-	}else {
-        
-		$keyword = $_POST["keyword"];
-        header('Location:store.php');
-		$sql = "SELECT * FROM products,categories WHERE product_cat=cat_id AND product_keywords LIKE '%$keyword%'";
-       
+
+		/*Vulnerability-SQL injection  
+    	Fixing - Using a prepared statement with parameter binding */
+	$stmt = $con->prepare("SELECT * FROM products,categories WHERE product_cat=cat_id AND (product_cat = ? OR product_brand = ? OR product_keywords LIKE ?)");
+  	$stmt->bind_param('iss', $cat_id, $brand_id, $keyword);
+
+	  if(isset($_POST["get_seleted_Category"])){
+		$cat_id = $_POST["cat_id"];
+	} elseif(isset($_POST["selectBrand"])){
+		$brand_id = $_POST["brand_id"];
+	} else {
+		$keyword = "%".$_POST["keyword"]."%";
+		header('Location:store.php');
 	}
-	
-	$run_query = mysqli_query($con,$sql);
+  
+  $stmt->execute();
+  $result = $stmt->get_result();
+
 	while($row=mysqli_fetch_array($run_query)){
 			$pro_id    = $row['product_id'];
 			$pro_cat   = $row['product_cat'];
@@ -230,8 +253,15 @@ if(isset($_POST["get_seleted_Category"]) || isset($_POST["selectBrand"]) || isse
 		$user_id = $_SESSION["uid"];
 
 		$sql = "SELECT * FROM cart WHERE p_id = '$p_id' AND user_id = '$user_id'";
-		$run_query = mysqli_query($con,$sql);
-		$count = mysqli_num_rows($run_query);
+
+			/*Vulnerability-SQL injection  
+    		Fixing - Using a prepared statement with parameter binding */
+			$stmt = mysqli_prepare($con, $sql);
+			mysqli_stmt_bind_param($stmt, "ii", $p_id, $user_id);
+			mysqli_stmt_execute($stmt);
+			$result = mysqli_stmt_get_result($stmt);
+			$count = mysqli_num_rows($result);
+
 		if($count > 0){
 			echo "
 				<div class='alert alert-warning'>
@@ -254,7 +284,14 @@ if(isset($_POST["get_seleted_Category"]) || isset($_POST["selectBrand"]) || isse
 		}
 		}else{
 			$sql = "SELECT id FROM cart WHERE ip_add = '$ip_add' AND p_id = '$p_id' AND user_id = -1";
-			$query = mysqli_query($con,$sql);
+
+				/*Vulnerability-SQL injection  
+    			Fixing - Using a prepared statement with parameter binding */
+			$stmt = mysqli_prepare($con, $sql);
+        	mysqli_stmt_bind_param($stmt, "si", $ip_add, $p_id);
+        	mysqli_stmt_execute($stmt);
+        	$result = mysqli_stmt_get_result($stmt);
+
 			if (mysqli_num_rows($query) > 0) {
 				echo "
 					<div class='alert alert-warning'>
