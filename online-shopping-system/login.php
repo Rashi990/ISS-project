@@ -9,17 +9,11 @@ session_start();
 
 if(isset($_POST["email"]) && isset($_POST["password"])){
 	$email = mysqli_real_escape_string($con,$_POST["email"]);
-	$password = mysqli_real_escape_string($con,$_POST["password"]);
-	$sql = "SELECT * FROM user_info WHERE email = ? AND password = ?";
-
-		/*Vulnerability-SQL injection  
-    	Fixing - Using a prepared statement with parameter binding */
-	$stmt = mysqli_prepare($con, $sql);
-	mysqli_stmt_bind_param($stmt, "ss", $email, $password);
-	mysqli_stmt_execute($stmt);
-	$result = mysqli_stmt_get_result($stmt);
-	$count = mysqli_num_rows($result);
-    $row = mysqli_fetch_array($result);
+	$password = $_POST["password"];
+	$sql = "SELECT * FROM user_info WHERE email = '$email' AND password = '$password'";
+	$run_query = mysqli_query($con,$sql);
+	$count = mysqli_num_rows($run_query);
+    $row = mysqli_fetch_array($run_query);
 		$_SESSION["uid"] = $row["user_id"];
 		$_SESSION["name"] = $row["first_name"];
 		$ip_add = getenv("REMOTE_ADDR");
@@ -47,7 +41,7 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 					}
 				}
 				//here we are destroying user cookie
-				setcookie("product_list","",strtotime("-1 day"),"/");
+				setcookie("product_list", "", strtotime("-1 day"), "/", "", true, true);
 				//if user is logging from after cart page we will send cart_login
 				echo "cart_login";
 				
@@ -57,9 +51,11 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 			}
 			//if user is login from page we will send login_success
 			echo "login_success";
-			$BackToMyPage = $_SERVER['HTTP_REFERER'];
-				if(!isset($BackToMyPage)) {
-					header('Location: '.$BackToMyPage);
+			$backToMyPage = filter_var($backToMyPage, FILTER_VALIDATE_URL);
+                        $trustedURLs = array('https://example.com', 'https://example.org');
+
+                            if ($backToMyPage && in_array($backToMyPage, $trustedURLs)) {
+                            header('Location: '.$backToMyPage);
 					echo"<script type='text/javascript'>
 					
 					</script>";

@@ -224,7 +224,7 @@ span.price {
 				<?php
 				if (isset($_POST["cmd"])) {
 				
-					$user_id = $_POST['custom'];
+					$user_id = htmlspecialchars($_POST['custom']);
 					
 					
 					$i=1;
