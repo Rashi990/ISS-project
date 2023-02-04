@@ -17,7 +17,7 @@ if (isset($_POST['re_password']))
     {
     if ($new_pass == $re_pass)
       {
-        $pass = md5($re_pass);
+        $pass = password_hash($re_pass, PASSWORD_BCRYPT);
       $update_pwd = mysqli_query($con,"UPDATE admin_info set admin_password='$pass' where admin_id='6'");
       echo "<script>alert('Update Sucessfully'); </script>";
       }
