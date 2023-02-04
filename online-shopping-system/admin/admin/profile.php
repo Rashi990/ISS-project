@@ -7,7 +7,7 @@ if (isset($_POST['re_password']))
     $email=$_SESSION['admin_email'];
 
   $old_pass = $_POST['old_pass'];
-  $op = md5($old_pass);
+  $op = password_hash($old_pass, PASSWORD_BCRYPT);
   $new_pass = $_POST['new_pass'];
   $re_pass = $_POST['re_pass'];
   $password_query = mysqli_query($con,"select * from admin_info where admin_email='$email'");
