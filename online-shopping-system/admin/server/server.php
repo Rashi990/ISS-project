@@ -81,7 +81,7 @@ if (isset($_POST['login_admin'])) {
   }
 
   if (count($errors) == 0) {
-    $password = md5($password);
+    $password = password_hash($password, PASSWORD_BCRYPT);
     $query = "SELECT * FROM admin_info WHERE admin_email='$admin_username' AND admin_password='$password'";
     $results = mysqli_query($db, $query);
     if (mysqli_num_rows($results) == 1) {
