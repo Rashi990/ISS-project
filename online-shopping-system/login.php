@@ -68,7 +68,7 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
 
 		}else{
                 $email = mysqli_real_escape_string($con,$_POST["email"]);
-                $password =md5($_POST["password"]) ;
+               	$password = password_hash($_POST["password"], PASSWORD_BCRYPT);
                 $sql = "SELECT * FROM admin_info WHERE admin_email = '$email' AND admin_password = '$password'";
                 $run_query = mysqli_query($con,$sql);
                 $count = mysqli_num_rows($run_query);
