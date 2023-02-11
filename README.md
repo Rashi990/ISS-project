@@ -2,10 +2,7 @@
 
 Memberes Names And Index Numbers.<br>
 
-P.K.S.S. Shermila.- 20021003 <br>
-T.N.Wickramasinghe.-20021161<br>
-P.R.Lakshika.-20020619<br>
-H.M.P.S. Anjalika-20020041<br>
+
 <table>
 <tr>
     <th>Names</th>
